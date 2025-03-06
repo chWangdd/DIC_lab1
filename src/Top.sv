@@ -43,7 +43,7 @@ always_ff@(posedge i_clk or negedge i_rst_n)begin
 		state_ff    <= state_comb;
 		o_strout_ff <= o_strout_comb;
 		counter_ff  <= counter_comb; 
-		mem_r <= mem_w ;
+		mem_r <= o_strout_ff[3:0];
 		key2_r <= key2_w ;
 	end
 end
@@ -54,7 +54,7 @@ always_comb begin
 	state_comb = state_ff;
 	o_strout_comb = o_strout_ff;
 	counter_comb = counter_ff;
-	mem_w = mem_r ;
+
 
 	
 	casex(state_ff)
@@ -62,40 +62,46 @@ always_comb begin
 			state_comb = (i_start) ? RUN1 : IDLE;
 			counter_comb = (i_start) ? 27'd0 : counter_ff + 27'd1;
 			o_strout_comb = (i_start) ? {counter_ff[14:5], counter_ff[15:6], 1'b0,counter_ff[4:0]} : o_strout_ff;
+
 		end
 		
 		FINISH: begin
 			state_comb = IDLE;
 			o_strout_comb = {o_strout_ff[24:0], poly};
-			mem_w = {o_strout_ff[24:0], poly} ;
+
 		end
 
 		RUN1: begin
 			state_comb = (counter_ff == 26'h3ff_fff8 ) ? RUN2 : ( (i_start) ? {1'b1, state_ff[2:0]} : state_ff);
 			counter_comb = (i_start) ? counter_ff :  counter_ff + 27'd8;
 			o_strout_comb = (i_start || counter_ff[24:3]) ? o_strout_ff : { o_strout_ff[24:0], poly };
+
 		end
 
 		RUN2: begin
 			state_comb = (counter_ff == 26'h3ff_fffc ) ? RUN3 : ( (i_start) ? {1'b1, state_ff[2:0]} : state_ff);
 			counter_comb = (i_start) ? counter_ff :  counter_ff + 27'd4;
 			o_strout_comb = (i_start || counter_ff[24:2]) ? o_strout_ff : { o_strout_ff[24:0], poly };
+
 		end
 
 		RUN3: begin
 			state_comb = (counter_ff == 26'h3ff_fffe ) ? RUN4 : ( (i_start) ? {1'b1, state_ff[2:0]} : state_ff);
 			counter_comb = (i_start) ? counter_ff :  counter_ff + 27'd2;
 			o_strout_comb = (i_start || counter_ff[24:1]) ? o_strout_ff : { o_strout_ff[24:0], poly };
+
 		end
 
 		RUN4: begin
 			state_comb = (counter_ff == 26'h3ff_ffff ) ? FINISH : ( (i_start) ? {1'b1, state_ff[2:0]} : state_ff);
 			counter_comb = (i_start) ? counter_ff :  counter_ff + 27'd1;
 			o_strout_comb = (i_start || counter_ff[24:0]) ? o_strout_ff : { o_strout_ff[24:0], poly };
+
 		end
 		// pause states
 		4'b1???: begin
 			state_comb = (i_start) ? {1'b0, state_ff[2:0]} : state_ff;
+
 		end
 		default: begin
 			
