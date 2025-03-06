@@ -149,8 +149,8 @@ Debounce deb0(
 	.o_neg(keydown1)
 );
 Debounce deb1(
-	.i_in(KEY[0]),
-	.i_rst_n(KEY[2]),
+	.i_in(KEY[2]),
+	.i_rst_n(KEY[1]),
 	.i_clk(CLOCK_50),
 	.o_neg(keydown2)
 );
