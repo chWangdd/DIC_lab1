@@ -1,0 +1,8 @@
+output_files/
+lint/
+db/
+incremental_db/
+*.qpf
+*.qsf
+*.qsf.bak
+*.qws
