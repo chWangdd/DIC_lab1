@@ -36,7 +36,7 @@ always_comb begin
 	S_PROC: begin
 		if (i_start) begin
 			state_w = (o_random_out_r == 4'd10) ? S_IDLE : state_w;
-			o_random_out_w = (o_random_out_r == 4'd10) ? 4'd2 : (o_random_out_r - 4'd1);
+			o_random_out_w = (o_random_out_r == 4'd10) ? 4'd1 : (o_random_out_r - 4'd1);
 		end
 	end
 
