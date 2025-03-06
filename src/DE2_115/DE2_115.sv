@@ -136,27 +136,44 @@ module DE2_115 (
 	inout [6:0] EX_IO
 );
 
-logic keydown;
-logic [3:0] random_value;
+logic keydown1;
+logic keydown2;
+logic [3:0] random_value1;
+logic [3:0] random_value2;
+
 
 Debounce deb0(
 	.i_in(KEY[0]),
 	.i_rst_n(KEY[1]),
 	.i_clk(CLOCK_50),
-	.o_neg(keydown)
+	.o_neg(keydown1)
+);
+Debounce deb1(
+	.i_in(KEY[0]),
+	.i_rst_n(KEY[2]),
+	.i_clk(CLOCK_50),
+	.o_neg(keydown2)
 );
 
 Top top0(
 	.i_clk(CLOCK_50),
 	.i_rst_n(KEY[1]),
-	.i_start(keydown),
-	.o_random_out(random_value)
+	.i_start(keydown1),
+	.i_mem(keydown2),
+	.o_random_out(random_value1),
+	.o_random_mem_out(random_value2)
 );
 
 SevenHexDecoder seven_dec0(
-	.i_hex(random_value),
+	.i_hex(random_value1),
 	.o_seven_ten(HEX1),
 	.o_seven_one(HEX0)
+);
+
+SevenHexDecoder seven_dec1(
+	.i_hex(random_value2),
+	.o_seven_ten(HEX3),
+	.o_seven_one(HEX2)
 );
 
 assign HEX2 = '1;

@@ -2,7 +2,9 @@ module Top (
 	input        i_clk,
 	input        i_rst_n,
 	input        i_start,
-	output [3:0] o_random_out
+	input        i_mem,
+	output [3:0] o_random_out,
+	output [3:0] o_random_mem_out
 );
 
 // please check out the working example in lab1 README (or Top_exmaple.sv) first
@@ -18,10 +20,14 @@ parameter IDLE   = 4'b0000,
 logic [3:0]   state_comb, state_ff;
 logic [25:0]  o_strout_comb, o_strout_ff;
 logic [26:0]   counter_comb, counter_ff;
+
+logic [3:0] key2_r, key2_w ; 
+logic [3:0] mem_r, mem_w ;
 wire  poly;
 // wire declaration
 assign poly = o_strout_ff[0] ^ o_strout_ff[1] ^ o_strout_ff[5] ^ o_strout_ff[25];
 assign o_random_out = o_strout_ff[3:0];	
+assign o_random_mem_out =  key2_r ;
 
 // sequential block
 always_ff@(posedge i_clk or negedge i_rst_n)begin
@@ -29,12 +35,16 @@ always_ff@(posedge i_clk or negedge i_rst_n)begin
 		state_ff      <= IDLE;
 		o_strout_ff   <= 0;
 		counter_ff    <= 0;
+		mem_r <= 0 ;
+		key2_r <= 0;
 	end
 		
 	else begin
 		state_ff    <= state_comb;
 		o_strout_ff <= o_strout_comb;
 		counter_ff  <= counter_comb; 
+		mem_r <= mem_w ;
+		key2_r <= key2_w ;
 	end
 end
 	
@@ -44,6 +54,8 @@ always_comb begin
 	state_comb = state_ff;
 	o_strout_comb = o_strout_ff;
 	counter_comb = counter_ff;
+	mem_w = mem_r ;
+
 	
 	casex(state_ff)
 		IDLE: begin
@@ -55,6 +67,7 @@ always_comb begin
 		FINISH: begin
 			state_comb = IDLE;
 			o_strout_comb = {o_strout_ff[24:0], poly};
+			mem_w = {o_strout_ff[24:0], poly} ;
 		end
 
 		RUN1: begin
@@ -88,6 +101,10 @@ always_comb begin
 			
 		end
 	endcase
+end
+
+always_comb begin
+    key2_w = (i_mem)? mem_r : key2_r ; 
 end
 
 
