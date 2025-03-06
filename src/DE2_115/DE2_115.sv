@@ -176,8 +176,6 @@ SevenHexDecoder seven_dec1(
 	.o_seven_one(HEX2)
 );
 
-assign HEX2 = '1;
-assign HEX3 = '1;
 assign HEX4 = '1;
 assign HEX5 = '1;
 assign HEX6 = '1;
